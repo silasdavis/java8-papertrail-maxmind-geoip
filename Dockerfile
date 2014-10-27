@@ -22,11 +22,6 @@ RUN apt-get install -y build-essential libcurl4-openssl-dev zlib1g-dev
 RUN tar zxvf geoipupdate-2.0.2.tar.gz
 RUN cd geoipupdate-2.0.2 && ./configure && make && make install
 RUN mkdir /usr/local/share/GeoIP
-
-# Now download a GeoIP database and schedule subsequent daily updates as a cron job.
-# (weekly would suffice actually, but making it daily ensures we get a fresh database within 24
-#  hours of initial depoy even if an older docker image is used which was built off an older
-#  database. Alternatively we could sync as part of the start script, but that might slow down
-#  end-to-end tests which don't depend critically on up-to-date GeoIP.)
-RUN /usr/local/bin/geoipupdate
 RUN ln -s /usr/local/bin/geoipupdate /etc/cron.daily/geoipupdate
+
+# Now do 'ADD GeoIP.conf /usr/local/etc/GeoIP.conf' in derived container
